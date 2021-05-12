@@ -1,68 +1,24 @@
-import React, { useState, useEffect }  from "react";
+import React  from "react";
 import "./App.css";
 import Footer from "./Footer";
 import Header from "./Header";
-import { getProducts } from './services/productService'
-import Spinner from './Spinner'
+import Products from './Products';
+import { Routes, Route } from 'react-router-dom';
+import Detail from './Detail';
+import Cart from './Cart';
 
 export default function App() {
-
-  const [size, setSize] = useState("");
-  const [products, setProducts] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const getProductList = async() => {
-    await getProducts('shoes')
-          .then((response) => setProducts(response))
-          .catch((e) => setError(e))
-          .finally(() => setLoading(false));
-  }
-
-  useEffect(() => {
-    getProductList();
-  }, [])
-  function renderProduct(p) {
-    return (
-      <div key={p.id} className="product">
-        <a href="/">
-          <img src={`/images/${p.image}`} alt={p.name} />
-          <h3>{p.name}</h3>
-          <p>${p.price}</p>
-        </a>
-      </div>
-    );
-  }
-
-  const filteredProducts = size
-    ? products.filter((p) => p.skus.find((s) => s.size === parseInt(size)))
-    : products;
-
-  if (error) throw error;
-  if (loading) return <Spinner />  
-
   return (
     <React.Fragment>
       <div className="content">
         <Header />
         <main>
-          <section id="filters">
-            <label htmlFor="size">Filter by Size:</label>{" "}
-            <select 
-              id="size"
-              value={size}
-              onChange= {(e) => { setSize(e.target.value)}}
-            >
-              <option value="">All sizes</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select>
-            {size && <h2>Found {filteredProducts.length} items</h2>}
-          </section>
-          <section id="products">
-            {filteredProducts.map(renderProduct)}
-          </section>
+          <Routes>
+            <Route path="/" > <h1>Welcome to Carved Rock Fitness</h1> </Route>
+            <Route path="/:category"> <Products /> </Route>
+            <Route path="/:category/:id" > <Detail /> </Route>
+            <Route path="/cart" > <Cart /> </Route>
+          </Routes>
         </main>
       </div>
       <Footer />
